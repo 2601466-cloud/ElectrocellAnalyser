@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ElectroCell Analyzer</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:
+    radial-gradient(circle at top left,#163d5c 0%,#07131f 45%,#03080d 100%);
+    color:#eaf7ff;
+    padding:25px;
+}
+
+.container{
+    max-width:1450px;
+    margin:auto;
+}
+
+header{
+    padding:10px 5px 25px;
+}
+
+header h1{
+    font-size:38px;
+    color:#58e8ff;
+    letter-spacing:1px;
+}
+
+header h1 span{
+    color:#ffffff;
+}
+
+.subtitle{
+    margin-top:7px;
+    color:#9eb6c7;
+    font-size:16px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:360px 1fr;
+    gap:20px;
+}
+
+.card{
+    background:rgba(12,29,44,0.88);
+    border:1px solid rgba(95,221,255,0.25);
+    border-radius:18px;
+    padding:22px;
+    box-shadow:0 15px 40px rgba(0,0,0,.35);
+}
+
+.card h2{
+    color:#5ceaff;
+    margin-bottom:20px;
+    font-size:21px;
+}
+
+label{
+    display:block;
+    margin-top:16px;
+    margin-bottom:7px;
+    color:#c7dbe7;
+    font-size:14px;
+}
+
+input,select{
+    width:100%;
+    padding:13px;
+    border-radius:10px;
+    border:1px solid #416273;
+    background:#081722;
+    color:white;
+    outline:none;
+    font-size:15px;
+}
+
+input:focus,select:focus{
+    border-color:#58e8ff;
+    box-shadow:0 0 8px rgba(88,232,255,.2);
+}
+
+.buttons{
+    display:flex;
+    gap:10px;
+    margin-top:22px;
+}
+
+button{
+    flex:1;
+    border:none;
+    border-radius:10px;
+    padding:14px;
+    font-weight:bold;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.analyze{
+    background:#51e4ff;
+    color:#03121b;
+}
+
+.reset{
+    background:#314c5d;
+    color:white;
+}
+
+button:hover{
+    transform:translateY(-1px);
+}
+
+.result-grid{
+    display:grid;
+    grid-template-columns:1.2fr 1fr 1fr;
+    gap:14px;
+}
+
+.result-box{
+    background:rgba(5,18,28,.75);
+    border:1px solid #29495b;
+    border-radius:14px;
+    padding:18px;
+}
+
+.result-box h3{
+    color:#a9c0cd;
+    font-size:13px;
+    margin-bottom:10px;
+}
+
+.big-value{
+    font-size:38px;
+    font-weight:bold;
+    color:#61efff;
+}
+
+.status{
+    display:inline-block;
+    margin-top:10px;
+    padding:6px 11px;
+    border-radius:20px;
+    background:#164c38;
+    color:#70ffbd;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.formula{
+    color:#d6e8f0;
+    line-height:1.8;
+    font-size:14px;
+}
+
+.reactions{
+    margin-top:18px;
+}
+
+.reaction{
+    background:#091925;
+    border-left:4px solid #51e4ff;
+    padding:12px;
+    margin-top:9px;
+    border-radius:7px;
+    color:#d9edf5;
+}
+
+.visual{
+    margin-top:20px;
+    padding:20px;
+    border-radius:15px;
+    background:#06121c;
+    border:1px solid #29495b;
+}
+
+.cell{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:30px;
+    margin-top:25px;
+    min-height:180px;
+}
+
+.beaker{
+    width:170px;
+    height:130px;
+    border:3px solid #7294a6;
+    border-top:none;
+    border-radius:0 0 25px 25px;
+    position:relative;
+    background:linear-gradient(to top,rgba(52,139,255,.25),rgba(52,139,255,.05));
+}
+
+.beaker.copper{
+    background:linear-gradient(to top,rgba(48,143,255,.45),rgba(48,143,255,.08));
+}
+
+.beaker.silver{
+    background:linear-gradient(to top,rgba(180,200,220,.25),rgba(180,200,220,.05));
+}
+
+.metal{
+    position:absolute;
+    bottom:0;
+    left:65px;
+    width:35px;
+    height:115px;
+    background:#8998a2;
+    border-radius:5px 5px 0 0;
+}
+
+.zinc{
+    background:linear-gradient(to right,#77858d,#c7d0d5,#65737a);
+}
+
+.copper-metal{
+    background:linear-gradient(to right,#743c20,#d47742,#713b20);
+}
+
+.silver-metal{
+    background:linear-gradient(to right,#79858d,#f0f5f7,#707a81);
+}
+
+.metal-label{
+    position:absolute;
+    top:-28px;
+    width:100%;
+    text-align:center;
+    font-weight:bold;
+}
+
+.salt{
+    width:170px;
+    height:28px;
+    border:4px solid #f0d76a;
+    border-bottom:none;
+    border-radius:20px 20px 0 0;
+    margin-bottom:115px;
+}
+
+.arrow{
+    color:#62efff;
+    font-size:28px;
+    font-weight:bold;
+}
+
+.graph-container{
+    margin-top:20px;
+    background:#06121c;
+    border:1px solid #29495b;
+    border-radius:15px;
+    padding:18px;
+}
+
+canvas{
+    width:100%;
+    height:250px;
+}
+
+.info{
+    margin-top:18px;
+    padding:15px;
+    background:rgba(32,70,88,.3);
+    border-radius:10px;
+    color:#bcd0da;
+    font-size:13px;
+    line-height:1.6;
+}
+
+.developers{
+    position:fixed;
+    right:22px;
+    bottom:15px;
+    text-align:right;
+    font-size:11px;
+    color:#9fb4c0;
+    background:rgba(3,12,18,.85);
+    border:1px solid rgba(88,232,255,.18);
+    padding:9px 13px;
+    border-radius:9px;
+    backdrop-filter:blur(5px);
+}
+
+.developers strong{
+    color:#58e8ff;
+    display:block;
+    margin-bottom:3px;
+}
+
+@media(max-width:950px){
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .result-grid{
+        grid-template-columns:1fr;
+    }
+
+    .developers{
+        position:static;
+        margin-top:20px;
+        text-align:center;
+    }
+}
+
+@media(max-width:600px){
+    body{
+        padding:12px;
+    }
+
+    header h1{
+        font-size:28px;
+    }
+
+    .cell{
+        gap:8px;
+        transform:scale(.85);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+    <h1>⚡ ElectroCell <span>Analyzer</span></h1>
+    <p class="subtitle">
+        Electrochemical Cell Simulation & Nernst Equation Analyzer
+    </p>
+</header>
+
+<div class="grid">
+
+<!-- LEFT SIDE -->
+
+<div class="card">
+
+<h2>🔬 Cell Setup</h2>
+
+<label>Cell Type</label>
+
+<select id="cellType" onchange="changeCell()">
+
+<option value="daniell">
+Daniell Cell (Zn–Cu)
+</option>
+
+<option value="znsilver">
+Zinc–Silver Cell (Zn–Ag)
+</option>
+
+<option value="cusilver">
+Copper–Silver Cell (Cu–Ag)
+</option>
+
+<option value="custom">
+Custom Zn–Cu Cell
+</option>
+
+</select>
+
+<label id="anodeLabel">Anode Ion Concentration (M)</label>
+
+<input id="anodeConc" type="number" value="1" min="0.000001" step="0.01">
+
+<label id="cathodeLabel">Cathode Ion Concentration (M)</label>
+
+<input id="cathodeConc" type="number" value="1" min="0.000001" step="0.01">
+
+<label>Temperature (°C)</label>
+
+<input id="temperature" type="number" value="25">
+
+<label>Measured Voltage (Optional)</label>
+
+<input id="measured" type="number" step="0.001" placeholder="Example: 1.08">
+
+<div class="buttons">
+
+<button class="analyze" onclick="analyzeCell()">
+⚡ ANALYZE CELL
+</button>
+
+<button class="reset" onclick="resetForm()">
+RESET
+</button>
+
+</div>
+
+<div class="info">
+
+<strong>How it works:</strong><br>
+Enter the ion concentrations and temperature.
+The software calculates the theoretical cell potential
+using the Nernst equation.
+
+</div>
+
+</div>
+
+
+<!-- RIGHT SIDE -->
+
+<div class="card">
+
+<h2>📊 Analysis Result</h2>
+
+<div class="result-grid">
+
+<div class="result-box">
+
+<h3>Predicted Cell Potential</h3>
+
+<div class="big-value" id="voltage">
+1.100 V
+</div>
+
+<div class="status" id="status">
+Cell Active
+</div>
+
+</div>
+
+<div class="result-box">
+
+<h3>Standard E°cell</h3>
+
+<div class="big-value" style="font-size:25px" id="standard">
+1.100 V
+</div>
+
+</div>
+
+<div class="result-box">
+
+<h3>Electrons Transferred</h3>
+
+<div class="big-value" style="font-size:25px">
+2 e⁻
+</div>
+
+</div>
+
+</div>
+
+
+<div class="result-box" style="margin-top:15px">
+
+<h3>Nernst Equation</h3>
+
+<div class="formula">
+
+E = E° − (RT/nF) ln Q
+
+<br>
+
+Q = [Anode Ion] / [Cathode Ion]
+
+<br>
+
+R = 8.314 J mol⁻¹ K⁻¹
+
+<br>
+
+F = 96485 C mol⁻¹
+
+<br>
+
+n = 2
+
+</div>
+
+</div>
+
+
+<div class="result-box" style="margin-top:15px">
+
+<h3>Reaction Quotient Q</h3>
+
+<div class="big-value" style="font-size:25px" id="Q">
+1.000
+</div>
+
+</div>
+
+
+<!-- REACTIONS -->
+
+<div class="reactions">
+
+<h2>⚗ Cell Reactions</h2>
+
+<div class="reaction" id="anodeReaction">
+Anode: Zn → Zn²⁺ + 2e⁻
+</div>
+
+<div class="reaction" id="cathodeReaction">
+Cathode: Cu²⁺ + 2e⁻ → Cu
+</div>
+
+<div class="reaction" id="overallReaction">
+Overall: Zn + Cu²⁺ → Zn²⁺ + Cu
+</div>
+
+</div>
+
+
+<!-- VISUALIZATION -->
+
+<div class="visual">
+
+<h2>🔋 Cell Visualization</h2>
+<video id="cellVideo" controls width="100%">
+  <source src="videos/daniell_cell_explained.mp4" type="video/mp4">
+  Your browser does not support video.
+</video>
+
+<div class="cell">
+
+<div class="beaker" id="leftBeaker">
+
+<div class="metal zinc" id="leftMetal">
+<div class="metal-label" id="leftMetalLabel">
+Zn
+</div>
+</div>
+
+</div>
+
+<div class="arrow">
+→ e⁻ →
+</div>
+
+<div class="salt">
+Salt Bridge
+</div>
+
+<div class="arrow">
+→
+</div>
+
+<div class="beaker copper" id="rightBeaker">
+
+<div class="metal copper-metal" id="rightMetal">
+
+<div class="metal-label" id="rightMetalLabel">
+Cu
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- COMPARISON -->
+
+<div class="result-box" style="margin-top:20px">
+
+<h3>📏 Voltage Comparison</h3>
+
+<div id="comparison">
+Enter a measured voltage to compare experimental and theoretical values.
+</div>
+
+</div>
+
+
+<!-- GRAPH -->
+
+<div class="graph-container">
+
+<h2>📈 Concentration Effect</h2>
+
+<canvas id="graph" width="800" height="300"></canvas>
+
+</div>
+
+
+<div class="info" id="suggestion">
+
+💡 Suggestion:
+Try changing the concentration of the ions and observe
+how the cell potential changes.
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- DEVELOPERS -->
+
+<div class="developers">
+
+<strong>Developed By</strong>
+
+Anupam Mali • Arshpreet Kaur Dhillon • Ashay Shrivastava<br>
+
+Ansh Verma • Aryan Gora
+
+</div>
+
+
+<script>
+
+const R = 8.314462618;
+const F = 96485.33212;
+const n = 2;
+
+let currentCell = "daniell";
+
+const cells = {
+
+daniell:{
+    anode:"Zn",
+    cathode:"Cu",
+    anodeIon:"Zn²⁺",
+    cathodeIon:"Cu²⁺",
+    E0:1.10,
+    leftClass:"zinc",
+    rightClass:"copper-metal"
+},
+
+znsilver:{
+    anode:"Zn",
+    cathode:"Ag",
+    anodeIon:"Zn²⁺",
+    cathodeIon:"Ag⁺",
+    E0:1.56,
+    leftClass:"zinc",
+    rightClass:"silver-metal"
+},
+
+cusilver:{
+    anode:"Cu",
+    cathode:"Ag",
+    anodeIon:"Cu²⁺",
+    cathodeIon:"Ag⁺",
+    E0:0.46,
+    leftClass:"copper-metal",
+    rightClass:"silver-metal"
+},
+
+custom:{
+    anode:"Zn",
+    cathode:"Cu",
+    anodeIon:"Zn²⁺",
+    cathodeIon:"Cu²⁺",
+    E0:1.10,
+    leftClass:"zinc",
+    rightClass:"copper-metal"
+}
+
+};
+
+
+function changeCell(){
+
+    currentCell = document.getElementById("cellType").value;
+
+    const cell = cells[currentCell];
+
+    document.getElementById("anodeLabel").innerText =
+        cell.anodeIon + " Concentration (M)";
+
+    document.getElementById("cathodeLabel").innerText =
+        cell.cathodeIon + " Concentration (M)";
+
+    document.getElementById("standard").innerText =
+        cell.E0.toFixed(3) + " V";
+
+    document.getElementById("anodeReaction").innerText =
+        "Anode: " + cell.anode + " → " +
+        cell.anodeIon + " + 2e⁻";
+
+    document.getElementById("cathodeReaction").innerText =
+        "Cathode: " + cell.cathodeIon +
+        " + 2e⁻ → " + cell.cathode;
+
+    document.getElementById("overallReaction").innerText =
+        "Overall: " + cell.anode +
+        " + " + cell.cathodeIon +
+        " → " + cell.anodeIon +
+        " + " + cell.cathode;
+
+    document.getElementById("leftMetalLabel").innerText =
+        cell.anode;
+
+    document.getElementById("rightMetalLabel").innerText =
+        cell.cathode;
+
+    updateMetalClasses();
+
+    analyzeCell();
+}
+
+
+function updateMetalClasses(){
+
+    const cell = cells[currentCell];
+
+    const left = document.getElementById("leftMetal");
+    const right = document.getElementById("rightMetal");
+
+    left.className = "metal " + cell.leftClass;
+    right.className = "metal " + cell.rightClass;
+}
+
+
+function analyzeCell(){
+
+    const cell = cells[currentCell];
+
+    const anodeConc =
+        parseFloat(document.getElementById("anodeConc").value);
+
+    const cathodeConc =
+        parseFloat(document.getElementById("cathodeConc").value);
+
+    const tempC =
+        parseFloat(document.getElementById("temperature").value);
+
+    if(
+        isNaN(anodeConc) ||
+        isNaN(cathodeConc) ||
+        isNaN(tempC) ||
+        anodeConc <= 0 ||
+        cathodeConc <= 0
+    ){
+
+        alert("Please enter valid positive concentrations.");
+        return;
+    }
+
+    const T = tempC + 273.15;
+
+    const Q = anodeConc / cathodeConc;
+
+    const E =
+        cell.E0 -
+        ((R*T)/(n*F))*Math.log(Q);
+
+    document.getElementById("voltage").innerText =
+        E.toFixed(3) + " V";
+
+    document.getElementById("Q").innerText =
+        Q.toFixed(3);
+
+    document.getElementById("standard").innerText =
+        cell.E0.toFixed(3) + " V";
+
+
+    if(E > 0){
+
+        document.getElementById("status").innerText =
+            "Cell Active";
+
+        document.getElementById("status").style.background =
+            "#164c38";
+
+        document.getElementById("status").style.color =
+            "#70ffbd";
+
+    }else{
+
+        document.getElementById("status").innerText =
+            "Non-Spontaneous";
+
+        document.getElementById("status").style.background =
+            "#5b2525";
+
+        document.getElementById("status").style.color =
+            "#ff9c9c";
+    }
+
+
+    const measured =
+        parseFloat(document.getElementById("measured").value);
+
+    if(!isNaN(measured)){
+
+        const difference = measured - E;
+
+        document.getElementById("comparison").innerHTML =
+            "<strong>Theoretical:</strong> " +
+            E.toFixed(3) +
+            " V<br>" +
+
+            "<strong>Measured:</strong> " +
+            measured.toFixed(3) +
+            " V<br>" +
+
+            "<strong>Difference:</strong> " +
+            difference.toFixed(3) +
+            " V";
+    }
+
+    generateSuggestion(Q,E);
+
+    drawGraph();
+}
+
+
+function generateSuggestion(Q,E){
+
+    let message = "";
+
+    if(Q > 1){
+
+        message =
+        "Increasing the anode-ion concentration relative to the cathode ion generally decreases the cell potential.";
+
+    }
+
+    else if(Q < 1){
+
+        message =
+        "A lower reaction quotient increases the cell potential under the ideal Nernst model.";
+
+    }
+
+    else{
+
+        message =
+        "At equal ion concentrations, the cell potential is close to its standard cell potential.";
+    }
+
+    document.getElementById("suggestion").innerHTML =
+        "💡 <strong>Suggestion:</strong> " + message;
+}
+
+
+function drawGraph(){
+
+    const canvas =
+        document.getElementById("graph");
+
+    const ctx =
+        canvas.getContext("2d");
+
+    const width = canvas.width;
+    const height = canvas.height;
+
+    ctx.clearRect(0,0,width,height);
+
+    const cell = cells[currentCell];
+
+    const temp =
+        parseFloat(document.getElementById("temperature").value) + 273.15;
+
+    const anode =
+        parseFloat(document.getElementById("anodeConc").value) || 1;
+
+    const cathode =
+        parseFloat(document.getElementById("cathodeConc").value) || 1;
+
+    ctx.strokeStyle = "#345263";
+    ctx.lineWidth = 1;
+
+    for(let i=0;i<6;i++){
+
+        const y = 30 + i*45;
+
+        ctx.beginPath();
+        ctx.moveTo(50,y);
+        ctx.lineTo(width-30,y);
+        ctx.stroke();
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(50,20);
+    ctx.lineTo(50,height-35);
+    ctx.lineTo(width-30,height-35);
+    ctx.stroke();
+
+    ctx.fillStyle = "#a9c0cd";
+    ctx.font = "13px Arial";
+
+    ctx.fillText(
+        "Cell Potential (V)",
+        55,
+        18
+    );
+
+    ctx.fillText(
+        "Anode/Cathode concentration ratio",
+        width-240,
+        height-10
+    );
+
+
+    let points = [];
+
+    for(let i=0;i<=10;i++){
+
+        const ratio =
+            0.1 + i*0.29;
+
+        const Q = ratio;
+
+        const E =
+            cell.E0 -
+            ((R*temp)/(n*F))*Math.log(Q);
+
+        const x =
+            50 + i*((width-80)/10);
+
+        const normalized =
+            (E - (cell.E0-0.05))/0.10;
+
+        const y =
+            height-35 -
+            normalized*150;
+
+        points.push({x,y});
+    }
+
+
+    ctx.strokeStyle = "#58e8ff";
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+
+    points.forEach((p,i)=>{
+
+        if(i===0)
+            ctx.moveTo(p.x,p.y);
+        else
+            ctx.lineTo(p.x,p.y);
+
+    });
+
+    ctx.stroke();
+
+
+    ctx.fillStyle = "#58e8ff";
+
+    points.forEach(p=>{
+
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,4,0,Math.PI*2);
+        ctx.fill();
+
+    });
+
+
+    const currentQ = anode/cathode;
+
+    let index =
+        Math.round((currentQ-0.1)/0.29);
+
+    index = Math.max(0,Math.min(10,index));
+
+    const point = points[index];
+
+    ctx.fillStyle = "#ffffff";
+
+    ctx.beginPath();
+    ctx.arc(point.x,point.y,7,0,Math.PI*2);
+    ctx.fill();
+
+}
+
+
+function resetForm(){
+
+    document.getElementById("cellType").value =
+        "daniell";
+
+    document.getElementById("anodeConc").value =
+        "1";
+
+    document.getElementById("cathodeConc").value =
+        "1";
+
+    document.getElementById("temperature").value =
+        "25";
+
+    document.getElementById("measured").value =
+        "";
+
+    currentCell = "daniell";
+
+    changeCell();
+
+    document.getElementById("comparison").innerText =
+        "Enter a measured voltage to compare experimental and theoretical values.";
+}
+
+
+changeCell();
+
+</script>
+
+</body>
+</html>
